@@ -1,6 +1,6 @@
 # My Project: Album Rename
 
-[demo video](https://github.com/Lukifer000/AlbumRename/blob/main/demo.mp4)
+[demo video](https://imgur.com/a/ZlAAasB)
 
 This project is a simple x64 tool for renaming album folders based on their metadata into my preferred format "artist - album (year)".
 This project uses The taglib library to read song metadata and does not change song metadata, or song file names.
