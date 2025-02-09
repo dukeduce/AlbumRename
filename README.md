@@ -1,5 +1,5 @@
 # My Project: Album Rename
-
+Click on video to view a short demo
 [![demo video](https://i.imgur.com/iLJmsMA.png)](https://i.imgur.com/obJ3trG.mp4)
 
 This project is a simple x64 tool for renaming album folders based on their metadata into my preferred format "artist - album (year)".
