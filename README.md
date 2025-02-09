@@ -1,6 +1,7 @@
 # My Project: Album Rename
 
 [![demo video](https://i.imgur.com/iLJmsMA.png)](https://i.imgur.com/obJ3trG.mp4)
+
 Click on image to view a short demo
 
 
