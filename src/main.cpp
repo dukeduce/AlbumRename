@@ -12,7 +12,7 @@ void renameAlbum(const fs::path& folderPath) {
 
     for (const auto& entry : fs::directory_iterator(folderPath)) {
         if (entry.is_directory()) {
-            renameAlbum(entry.path()); // Recursion for further albums in subfolders
+            renameAlbum(entry.path()); // Recursively process subdirectories
             continue;
         }
 
@@ -32,11 +32,16 @@ void renameAlbum(const fs::path& folderPath) {
         }
     }
 
-    if (!newFolderName.empty()) {
+    if (!newFolderName.empty() && (newFolderName != oldFolderName)) {
         fs::path newFolderPath = folderPath.parent_path() / newFolderName;
         try {
             fs::rename(folderPath, newFolderPath);
-            std::wcout << L"Renamed: " << oldFolderName << L" -> " << newFolderName << std::endl;
+            if (folderPath.parent_path() != "."){   // root folder or album subdirectory
+                std::wcout << L"Renamed: " << folderPath.parent_path().generic_wstring() << "/" << oldFolderName << L" -> " << newFolderName << std::endl;
+            }else{
+                std::wcout << L"Renamed: " << oldFolderName << L" -> " << newFolderName << std::endl;
+            }
+            
         } catch (const std::exception& e) {
             std::wcerr << L"Error: cannot rename folder: " << e.what() << std::endl;
         }
@@ -53,7 +58,7 @@ int main() {
     std::cout << "Enter [.] to rename all albums in the same folder OR Specify a folder name:";
     std::wcin >> path;
 
-    if (fs::exists(path) && fs::is_directory(path)) {
+    if (fs::is_directory(path)) {
         for (const auto& folder : fs::directory_iterator(path)) {
             if (folder.is_directory()) {
                 renameAlbum(folder.path());
@@ -63,7 +68,7 @@ int main() {
         std::wcerr << L"Error: The specified path is invalid or not a directory!" << std::endl;
     }
     
-    std::cout << "Press any key to quit...";
+    std::wcout << L"Press any key to quit...";
     _getch();
 
     return 0;
