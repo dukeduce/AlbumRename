@@ -1,19 +1,20 @@
 # My Project: Album Rename
 
-[![demo video](https://i.imgur.com/iLJmsMA.png)](https://i.imgur.com/obJ3trG.mp4)
+[![demo video](https://i.imgur.com/BoTYPW9.png)](https://i.imgur.com/Q86F470.mp4)
 
 Click on image to view a short demo
 
 
-This project is a simple x64 tool for renaming album folders based on their metadata into my preferred format "artist - album (year)".
+This project is a simple tool for renaming album folders to "artist - album (year)".
 This project uses The taglib library to read song metadata and does not change song metadata, or song file names.
-Album Rename supports unicode folder names by the use of #include <windows.h> and #include <locale> library.
+Album Rename supports unicode folder names, and tags.
 
-## Building
 
-1. **Download and Extract** the project files.
-2. **Have MINGW** installed on your system.
-3. **Run `build.cmd`**
+## Release
+
+The tool is precompiled for use in windows x64 and x86. 
+Other OS's may not work as intended with their file managers.
+
 
 ## Dependencies
 
@@ -21,11 +22,14 @@ Album Rename supports unicode folder names by the use of #include <windows.h> an
 - Zlib: [Zlib Website](https://zlib.net/)
 
 These dependencies are precompiled as x64-mingw-static and included in the `lib` and `include` directory.
+Taglib 2.0.2
+Zlib 1.3.1
+utf8cpp 4.0.6
 
 
 ## Usage
 
-After building the project, you can place the executable `AlbumRename.exe` in the directory of your album folders to rename them.
+Place the executable `AlbumRename.exe` in the directory of your album folders to rename them and double click the executable.
 
 
 ## License
