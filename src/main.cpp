@@ -6,13 +6,14 @@
 #include <locale>           // UTF-8 interpretation in wcout
 namespace fs = std::filesystem;
 
-void renameAlbum(const fs::path& folderPath) {
+void renameAlbum(const fs::path& folderPath, const fs::path& rootPath) {
+    std::wstring parentPath{folderPath.parent_path().generic_wstring()};
     std::wstring newFolderName{};
     std::wstring oldFolderName{folderPath.filename().wstring()};
 
     for (const auto& entry : fs::directory_iterator(folderPath)) {
         if (entry.is_directory()) {
-            renameAlbum(entry.path()); // Recursively process subdirectories
+            renameAlbum(entry.path(), rootPath); // Recursively process subdirectories
             continue;
         }
 
@@ -21,13 +22,18 @@ void renameAlbum(const fs::path& folderPath) {
         } // Not a song file, continue to next file
 
         TagLib::FileRef f(entry.path().c_str());
-        if (!f.isNull() && f.tag()) {
+        if (!f.isNull() && f.audioProperties()) {
             TagLib::Tag* tag = f.tag();
             std::wstring artist = tag->artist().toWString();
             std::wstring album = tag->album().toWString();
             std::wstring year = std::to_wstring(tag->year());
-            // Format the folder name as "artist - album (year)"
-            newFolderName = artist + L" - " + album + L" (" + year + L")";
+
+            if (year == L"0" || artist.empty() || album.empty()){
+                std::wcout << L"Folder: " << folderPath.generic_wstring() << " does not have complete tags" << std::endl;
+            }else{
+                // Format the folder name as "artist - album (year)"
+                newFolderName = artist + L" - " + album + L" (" + year + L")";
+            }
             break;
         }
     }
@@ -36,17 +42,17 @@ void renameAlbum(const fs::path& folderPath) {
         fs::path newFolderPath = folderPath.parent_path() / newFolderName;
         try {
             fs::rename(folderPath, newFolderPath);
-            if (folderPath.parent_path() != "."){   // root folder or album subdirectory
-                std::wcout << L"Renamed: " << folderPath.parent_path().generic_wstring() << "/" << oldFolderName << L" -> " << newFolderName << std::endl;
+            if (folderPath.parent_path() != rootPath){   // if root folder or album subdirectory
+                std::wcout << L"Renamed: " << parentPath << "/" << oldFolderName << L" -> " << newFolderName << std::endl;
             }else{
                 std::wcout << L"Renamed: " << oldFolderName << L" -> " << newFolderName << std::endl;
             }
-            
         } catch (const std::exception& e) {
             std::wcerr << L"Error: cannot rename folder: " << e.what() << std::endl;
         }
     }
 }
+
 
 int main() {
     SetConsoleOutputCP(CP_UTF8);  // Set console output to UTF-8
@@ -55,13 +61,13 @@ int main() {
     // std::wcout << L"Testing Unicode: Æ, ☺, 漢字" << std::endl;
     
     fs::path path;
-    std::cout << "Enter [.] to rename all albums in the same folder OR Specify a folder name:";
+    std::cout << "Enter [.] to rename all albums in the folder OR Specify a folder path: ";
     std::wcin >> path;
 
     if (fs::is_directory(path)) {
         for (const auto& folder : fs::directory_iterator(path)) {
             if (folder.is_directory()) {
-                renameAlbum(folder.path());
+                renameAlbum(folder.path(), path);
             }
         }
     } else {
