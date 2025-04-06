@@ -59,23 +59,41 @@ int main() {
     SetConsoleCP(CP_UTF8);        // Set console input to UTF-8
     std::setlocale(LC_ALL, "en_US.UTF-8");
     // std::wcout << L"Testing Unicode: Æ, ☺, 漢字" << std::endl;
-    
-    fs::path path;
-    std::cout << "Enter [.] to rename all albums in the folder OR Specify a folder path: ";
-    std::wcin >> path;
 
-    if (fs::is_directory(path)) {
-        for (const auto& folder : fs::directory_iterator(path)) {
-            if (folder.is_directory()) {
-                renameAlbum(folder.path(), path);
+    int repeat {1};
+    while(repeat != 0) {
+        std::wstring pathString;
+        std::wcout << L"Enter [.] to rename all albums in the folder OR Specify a folder path: ";
+        
+        std::getline(std::wcin, pathString);  // Read the input as a wide string
+
+        // fs::path to std::wstring
+        fs::path path {pathString};
+
+        if (fs::is_directory(path)) {
+            if (path != ".") {
+                renameAlbum(path, path); // Process the given folder
+            } else {
+                for (const auto& folder : fs::directory_iterator(path)) {
+                    if (folder.is_directory()) {
+                        renameAlbum(folder.path(), path);
+                    }
+                }
             }
+        } else {
+            std::wcerr << L"Error: The specified path is invalid or not a directory!" << std::endl;
         }
-    } else {
-        std::wcerr << L"Error: The specified path is invalid or not a directory!" << std::endl;
+
+        // Clear the input buffer to avoid leftover newline
+        std::wcin.ignore(std::numeric_limits<std::streamsize>::max(), L'\n'); 
+
+        // Ask for repeat choice and make sure to consume the leftover newline
+        std::wcout << L"Enter 0 to quit, or any other key to continue: ";
+        std::wcin >> repeat;
+
+        // Clear the input buffer again after reading the number
+        std::wcin.ignore(std::numeric_limits<std::streamsize>::max(), L'\n');
     }
     
-    std::wcout << L"Press any key to quit...";
-    _getch();
-
     return 0;
 }
