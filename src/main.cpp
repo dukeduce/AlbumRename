@@ -48,9 +48,19 @@ void renameAlbum(const fs::path& folderPath, const fs::path& rootPath) {
                 std::wcout << L"Renamed: " << oldFolderName << L" -> " << newFolderName << std::endl;
             }
         } catch (const std::exception& e) {
-            std::wcerr << L"Error: cannot rename folder: " << e.what() << std::endl;
+            std::wstring wide_ewhat = wexception(e.what()); // wide eror
+            std::wcerr << L"Error: cannot rename folder: " << wide_ewhat << std::endl;
         }
     }
+}
+
+std::wstring wexception(const char *c) // wide string
+{
+    const size_t cSize = strlen(c)+1;
+    std::wstring wc( cSize, L'0' );
+    mbstowcs( &wc[0], c, cSize );
+
+    return wc;
 }
 
 
@@ -60,15 +70,17 @@ int main() {
     std::setlocale(LC_ALL, "en_US.UTF-8");
     // std::wcout << L"Testing Unicode: Æ, ☺, 漢字" << std::endl;
 
-    int repeat {1};
-    while(repeat != 0) {
+    while (true) {
         std::wstring pathString;
-        std::wcout << L"Enter [.] to rename all albums in the folder OR Specify a folder path: ";
+        std::wcout << L"Enter [.] to rename all albums or specify a folder name. press Enter to exit: ";
         
-        std::getline(std::wcin, pathString);  // Read the input as a wide string
+        std::getline(std::wcin, pathString);  // input go to wstring
 
-        // fs::path to std::wstring
-        fs::path path {pathString};
+        if (pathString.empty()) {
+            break;
+        }
+
+        fs::path path{pathString}; // fs::wstring to std::path
 
         if (fs::is_directory(path)) {
             if (path != ".") {
@@ -83,17 +95,6 @@ int main() {
         } else {
             std::wcerr << L"Error: The specified path is invalid or not a directory!" << std::endl;
         }
-
-        // Clear the input buffer to avoid leftover newline
-        std::wcin.ignore(std::numeric_limits<std::streamsize>::max(), L'\n'); 
-
-        // Ask for repeat choice and make sure to consume the leftover newline
-        std::wcout << L"Enter 0 to quit, or any other key to continue: ";
-        std::wcin >> repeat;
-
-        // Clear the input buffer again after reading the number
-        std::wcin.ignore(std::numeric_limits<std::streamsize>::max(), L'\n');
     }
-    
     return 0;
 }
